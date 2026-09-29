@@ -242,22 +242,22 @@ const RemoteAccess = ({ serverId }) => {
                 />
             ) : (
                 <div className="ra-list">
-                    {visibleTunnels.map((t) => {
-                        const svcs = services[t.id] || [];
-                        const isCurrentPrivate = t.private_server_id === serverId;
-                        const isCurrentEdge = t.edge_server_id === serverId;
+                    {visibleTunnels.map((tunnel) => {
+                        const svcs = services[tunnel.id] || [];
+                        const isCurrentPrivate = tunnel.private_server_id === serverId;
+                        const isCurrentEdge = tunnel.edge_server_id === serverId;
                         return (
-                            <section key={t.id} className="ra-tunnel">
+                            <section key={tunnel.id} className="ra-tunnel">
                                 <div className="ra-tunnel__head">
                                     <div className="ra-tunnel__info">
                                         <div className="ra-tunnel__route">
                                             <span className="ra-node">
                                                 <span className="ra-node__ico"><HardDrive size={14} /></span>
                                                 {serverId ? (
-                                                    t.private_server_name || t.private_server_id
+                                                    tunnel.private_server_name || tunnel.private_server_id
                                                 ) : (
-                                                    <Link to={`/servers/${t.private_server_id}/remote-access`}>
-                                                        {t.private_server_name || t.private_server_id}
+                                                    <Link to={`/servers/${tunnel.private_server_id}/remote-access`}>
+                                                        {tunnel.private_server_name || tunnel.private_server_id}
                                                     </Link>
                                                 )}
                                                 {isCurrentPrivate && <span className="ra-node__tag">{t('app.remoteAccess.thisServer', 'this server')}</span>}
@@ -266,26 +266,26 @@ const RemoteAccess = ({ serverId }) => {
                                             <span className="ra-node">
                                                 <span className="ra-node__ico"><Cloud size={14} /></span>
                                                 {serverId ? (
-                                                    t.edge_server_name || t.edge_server_id
+                                                    tunnel.edge_server_name || tunnel.edge_server_id
                                                 ) : (
-                                                    <Link to={`/servers/${t.edge_server_id}/remote-access`}>
-                                                        {t.edge_server_name || t.edge_server_id}
+                                                    <Link to={`/servers/${tunnel.edge_server_id}/remote-access`}>
+                                                        {tunnel.edge_server_name || tunnel.edge_server_id}
                                                     </Link>
                                                 )}
                                                 {isCurrentEdge && <span className="ra-node__tag">{t('app.remoteAccess.thisServer', 'this server')}</span>}
                                             </span>
-                                            <Pill kind={pillKind(t.status)}>{t.status || 'unknown'}</Pill>
+                                            <Pill kind={pillKind(tunnel.status)}>{tunnel.status || 'unknown'}</Pill>
                                         </div>
                                         <div className="ra-tunnel__meta">
-                                            <span>{t.subnet}</span>
+                                            <span>{tunnel.subnet}</span>
                                             <span className="ra-dot">·</span>
-                                            <span>{t.interface_name}</span>
+                                            <span>{tunnel.interface_name}</span>
                                             <span className="ra-dot">·</span>
-                                            <span>UDP {t.listen_port}</span>
+                                            <span>UDP {tunnel.listen_port}</span>
                                             <span className="ra-dot">·</span>
                                             <span>
-                                                {t.last_handshake_at
-                                                    ? `handshake ${new Date(t.last_handshake_at).toLocaleString()}`
+                                                {tunnel.last_handshake_at
+                                                    ? `handshake ${new Date(tunnel.last_handshake_at).toLocaleString()}`
                                                     : 'no handshake yet'}
                                             </span>
                                         </div>
@@ -305,7 +305,7 @@ const RemoteAccess = ({ serverId }) => {
                                     </div>
                                 </div>
 
-                                {!t.last_handshake_at && t.status !== 'up' && (
+                                {!tunnel.last_handshake_at && tunnel.status !== 'up' && (
                                     <div className="ra-tunnel__warn">
                                         <AlertTriangle size={14} />
                                         <span>
@@ -359,7 +359,7 @@ const RemoteAccess = ({ serverId }) => {
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
-                                                        onClick={() => unpublish(t.id, svc)}
+                                                        onClick={() => unpublish(tunnel.id, svc)}
                                                     >
                                                         {t('common.actions.remove', 'Remove')}
                                                     </Button>
