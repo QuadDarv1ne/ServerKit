@@ -184,14 +184,9 @@
         height: 34px;
     }
 
-    .extension-card__logo {
-        width: 44px;
-        height: 44px;
-        object-fit: contain;
-    }
-
-    // Illustrated raster icon sits centred at a fixed size (never stretched or
-    // zoomed) so every card reads consistently with room around the art.
+    // Registry logos and bundled illustrated icons share one size (never
+    // stretched or zoomed) so every card reads consistently with room around
+    // the art; registry logos are normalized to the same fill at the source.
     .extension-card__icon {
         width: 92px;
         height: 92px;
@@ -455,12 +450,6 @@
         .extension-card__glyph {
             width: 46px;
             height: 46px;
-        }
-
-        .extension-card__logo {
-            width: 60px;
-            height: 60px;
-            object-fit: contain;
         }
 
         .extension-card__icon {
