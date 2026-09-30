@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated": "2026-09-29",
+  "updated": "2026-09-30",
   "note": "Bundled fallback copy of the ServerKit extension registry index. The live index is fetched from SERVERKIT_REGISTRY_URL when configured; this file is used offline and in tests. It is a MIRROR of serverkit-extensions/index.json on main \u2014 do not hand-edit entries here, or it drifts from the artifacts it pins and installs fail checksum verification on exactly the panels that are already offline. Regenerate by copying that file's extensions array; tests/test_registry_bundled_index.py checks the two agree. Schema v3 adds optional per-entry `signature` + `publisher_key_id` (ed25519 minisign-style detached signature over the release zip, verified against the panel's pinned publisher keys at install \u2014 plan 55 D3). v1/v2 indexes without those fields remain valid; their entries are treated as unsigned.",
   "extensions": [
     {
@@ -353,7 +353,7 @@
       "slug": "serverkit-tramo",
       "display_name": "Automations",
       "description": "Node-based automation builder powered by tramo. Design workflows on a visual canvas (triggers, actions, branches, loops, approval gates) that react to panel events or run on a schedule, with 21 brand integration packs (Telegram, GitHub, Gmail, Discord, Notion, Stripe, Cloudflare, Postgres, Twilio and more). Enabled workflows deploy to a managed tramo container on the panel host that runs them headless, with run history, approvals, and inbound webhooks proxied through the panel. This replaces the older drag-and-drop Workflow Builder.",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "category": "deployment",
       "author": "ServerKit",
       "first_party": true,
@@ -366,14 +366,14 @@
       ],
       "min_panel_version": "1.7.0",
       "max_panel_version": null,
-      "source": "https://github.com/jhd3197/serverkit-tramo/releases/download/v1.0.2/serverkit-tramo-1.0.2.zip",
-      "sha256": "7efc9d192674be8b977c300638cab5d0e4e36f667c04eccd4927c4292ba84fc6",
+      "source": "https://github.com/jhd3197/serverkit-tramo/releases/download/v1.0.3/serverkit-tramo-1.0.3.zip",
+      "sha256": "2fd311523098c3d8f192de744d10494b35af713d1349d5f3056503e969af731e",
       "repo": "https://github.com/jhd3197/serverkit-tramo",
       "homepage": "https://github.com/jhd3197/serverkit-tramo",
       "featured": true,
       "feature_score": 90,
       "logo": "assets/serverkit-tramo/logo.png",
-      "signature": "RUSisf2r8uF4y5BEP4MEk4ug9IQhZcAiEt6WcZw/w4FFUzBMtnGOZ+ZNuaUOHx0fS8E8iJbWNJmjI1Ml3FUY5qaMU4pb+8ljkAQ=",
+      "signature": "RUSisf2r8uF4ywuRVgO2yST6e48hVZHQi2ufxlCiJkYUEcE/u87nQFhhtF9Uo6rJL1o+HPdZ1TcTPYURPASJ9+pe89l/YhQkowc=",
       "publisher_key_id": "serverkit-official"
     },
     {
