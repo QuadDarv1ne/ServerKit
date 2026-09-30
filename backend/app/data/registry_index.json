@@ -451,32 +451,6 @@
       "logo": "assets/serverkit-redis/logo.svg"
     },
     {
-      "slug": "serverkit-minecraft",
-      "display_name": "Minecraft Server",
-      "description": "Run a Minecraft server for your friends in a few clicks: Java (Vanilla/Paper/Fabric/Forge) and Bedrock, on the standard itzg community images. Live console (RCON), players, save-aware backups, scheduled restarts with in-game warnings, and a 'Share with friends' card showing exactly what to paste into the game client. First vertical of the ServerKit game-server family.",
-      "version": "1.0.0",
-      "category": "games",
-      "author": "ServerKit",
-      "first_party": true,
-      "bundled": false,
-      "permissions": [
-        "docker",
-        "filesystem",
-        "network"
-      ],
-      "min_panel_version": "1.7.0",
-      "max_panel_version": null,
-      "source": "https://github.com/jhd3197/serverkit-minecraft/releases/download/v1.0.0/serverkit-minecraft-1.0.0.zip",
-      "sha256": "b4cf00de9b97a9e68c8ba2e9305b4bcac94499aefd78824a1961a1991554da6a",
-      "repo": "https://github.com/jhd3197/serverkit-minecraft",
-      "homepage": "https://github.com/jhd3197/serverkit-minecraft",
-      "featured": true,
-      "feature_score": 85,
-      "logo": "assets/serverkit-minecraft/logo.png",
-      "signature": "RUSisf2r8uF4y23+Ewf4eCC+2AToGfHNAUeu4+nTgnCK0J4saaHOBShtW2NNXZ/XaQE340LNNNLTEhCMdHax+rWzNuW5F2yf/Ag=",
-      "publisher_key_id": "serverkit-official"
-    },
-    {
       "slug": "serverkit-fail2ban",
       "display_name": "Fail2ban",
       "description": "Fail2ban brute-force protection for ServerKit: service status, jail overview, ban/unban, and one-click install. Managed jails written by the panel (per-site brute-force protection) keep working; this extension adds the management surface.",
@@ -596,6 +570,32 @@
       "feature_score": 0,
       "logo": "assets/serverkit-image-scan/logo.svg",
       "signature": "RUSisf2r8uF4y4+3tYKno5YiN4FFI7Q6EDgcSLJbY8ns2NU39qs40mPaG/V92tZI6nj8HPVQvoFuNYcqVvJJf00AUiu+gJACtg4=",
+      "publisher_key_id": "serverkit-official"
+    },
+    {
+      "slug": "serverkit-minecraft",
+      "display_name": "Minecraft Server",
+      "description": "Run a Minecraft server for your friends in a few clicks: Java (Vanilla/Paper/Fabric/Forge) and Bedrock, on the standard itzg community images. Live console (RCON), players, save-aware backups, scheduled restarts with in-game warnings, and a 'Share with friends' card showing exactly what to paste into the game client. First vertical of the ServerKit game-server family.",
+      "version": "1.0.0",
+      "category": "games",
+      "author": "ServerKit",
+      "first_party": true,
+      "bundled": false,
+      "permissions": [
+        "docker",
+        "filesystem",
+        "network"
+      ],
+      "min_panel_version": "1.7.0",
+      "max_panel_version": null,
+      "source": "https://github.com/jhd3197/serverkit-minecraft/releases/download/v1.0.0/serverkit-minecraft-1.0.0.zip",
+      "sha256": "b4cf00de9b97a9e68c8ba2e9305b4bcac94499aefd78824a1961a1991554da6a",
+      "repo": "https://github.com/jhd3197/serverkit-minecraft",
+      "homepage": "https://github.com/jhd3197/serverkit-minecraft",
+      "featured": false,
+      "feature_score": 0,
+      "logo": "assets/serverkit-minecraft/logo.png",
+      "signature": "RUSisf2r8uF4y23+Ewf4eCC+2AToGfHNAUeu4+nTgnCK0J4saaHOBShtW2NNXZ/XaQE340LNNNLTEhCMdHax+rWzNuW5F2yf/Ag=",
       "publisher_key_id": "serverkit-official"
     }
   ]
