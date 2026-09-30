@@ -1,5 +1,6 @@
 import { io } from 'socket.io-client';
 import { SOCKET_EVENTS } from '../constants/events';
+import { TUNNEL_BASE, storageKey } from './tunnelBase.js';
 
 const getSocketUrl = () => {
     if (import.meta.env.DEV) return window.location.origin;
@@ -15,7 +16,7 @@ class SocketService {
     }
 
     connect() {
-        const token = localStorage.getItem('access_token');
+        const token = localStorage.getItem(storageKey('access_token'));
         if (!token) {
             console.warn('No token available for WebSocket connection');
             return;
@@ -27,6 +28,9 @@ class SocketService {
 
         this.socket = io(SOCKET_URL, {
             auth: { token },
+            // Through ServerKit Cloud's relay the panel lives under a prefix,
+            // and so does its Socket.IO endpoint.
+            ...(TUNNEL_BASE ? { path: `${TUNNEL_BASE}/socket.io` } : {}),
             transports: ['websocket', 'polling'],
             reconnection: true,
             reconnectionAttempts: 5,

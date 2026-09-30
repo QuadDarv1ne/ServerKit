@@ -89,6 +89,16 @@ export async function redeemLoginLink(token) {
     return data;
 }
 
+// Opened from ServerKit Cloud through its relay: the relay hands the panel
+// Cloud's signed grant, and the panel signs in the user with that email.
+export async function connectSession() {
+    const data = await this.request('/auth/connect-session', { method: 'POST' });
+    if (data.access_token) {
+        this.setTokens(data.access_token, data.refresh_token);
+    }
+    return data;
+}
+
 // Demo mode
 export async function getDemoInfo() {
     return this.request('/auth/demo-info');

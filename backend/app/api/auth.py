@@ -455,6 +455,38 @@ def redeem_login_link():
 
 
 # ==========================================
+# SERVERKIT CLOUD (the relay tunnel)
+# ==========================================
+@auth_bp.route('/connect-session', methods=['POST'])
+@limiter.limit("30 per minute")
+def connect_session():
+    """Sign in somebody who opened this panel from ServerKit Cloud.
+
+    The relay brought Cloud's signed grant with the request; it is verified
+    here against Cloud's JWKS and mapped to the panel user with the same
+    email (app/services/connect_session.py). Anybody else gets the normal
+    login page, which is what the 4xx tells the SPA.
+    """
+    from app.services import connect_session as cs
+    try:
+        user, claims = cs.user_for_request(request)
+    except cs.ConnectSessionRefused as exc:
+        logger.info('ServerKit Cloud sign-in refused (%s)', exc.code)
+        raise AuthenticationError(exc.message, code=f'auth.connect_{exc.code}')
+    # The panel's own second factor still applies: Cloud vouches for the
+    # email, not for this panel's authenticator.
+    if user.totp_enabled:
+        raise AuthenticationError('This account uses two-factor authentication. '
+                                  'Sign in with the panel login.', code='auth.connect_2fa')
+    access_token, refresh_token = cs.sign_in(user, claims)
+    return jsonify({
+        'user': user.to_dict(),
+        'access_token': access_token,
+        'refresh_token': refresh_token
+    }), 200
+
+
+# ==========================================
 # DEMO MODE
 # ==========================================
 @auth_bp.route('/demo-info', methods=['GET'])

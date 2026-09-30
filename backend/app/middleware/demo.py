@@ -18,6 +18,7 @@ ALLOWLIST = {
     '/api/v1/auth/refresh',
     '/api/v1/auth/logout',
     '/api/v1/auth/login-links/redeem',
+    '/api/v1/auth/connect-session',
 }
 
 

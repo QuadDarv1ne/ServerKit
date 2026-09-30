@@ -499,11 +499,20 @@ def create_app(config_name=None):
     # path-prefix exceptions can turn a pending token into a full session.
 
     # Serve frontend for root path
+    def _spa_page():
+        # Opened from ServerKit Cloud, the page is served under the relay's
+        # path prefix (app/services/connect_session.py).
+        from app.services import connect_session
+        prefix = connect_session.tunnel_prefix(request)
+        if prefix:
+            return connect_session.index_under_prefix(app.static_folder, prefix)
+        return send_from_directory(app.static_folder, 'index.html')
+
     @app.route('/')
     def serve_index():
         index = os.path.join(app.static_folder, 'index.html') if app.static_folder else None
         if index and os.path.isfile(index):
-            return send_from_directory(app.static_folder, 'index.html')
+            return _spa_page()
         return {'message': 'ServerKit API is running', 'docs': '/api/v1/'}, 200
 
     # Expected application failures. Services raise these typed errors and the
@@ -574,7 +583,7 @@ def create_app(config_name=None):
         # Serve SPA index.html if it exists, otherwise JSON 404
         index = os.path.join(app.static_folder, 'index.html') if app.static_folder else None
         if index and os.path.isfile(index):
-            return send_from_directory(app.static_folder, 'index.html')
+            return _spa_page()
         return {'error': 'Not found'}, 404
 
     return app

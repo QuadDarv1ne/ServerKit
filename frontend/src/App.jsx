@@ -10,6 +10,7 @@ import { ResourceTierProvider } from './contexts/ResourceTierContext';
 import { NotificationsProvider } from './contexts/NotificationsContext';
 import { WorkspaceProvider } from './contexts/WorkspaceContext';
 import { rememberRedirect } from './utils/redirectAfterLogin';
+import { TUNNEL_BASE } from './services/tunnelBase.js';
 import { Toaster } from './components/ui/sonner';
 import ThemeSync from './components/ThemeSync';
 import LocaleSync from './components/LocaleSync';
@@ -247,7 +248,7 @@ function AppRoutes() {
 
 function App() {
     return (
-        <Router>
+        <Router basename={TUNNEL_BASE || undefined}>
             {/* Outermost: a toast raised while the theme or workspace is still
                 initialising must already be translatable (plan 79 B1). */}
             <LocaleProvider>
