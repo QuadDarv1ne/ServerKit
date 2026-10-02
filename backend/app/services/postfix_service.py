@@ -133,7 +133,7 @@ mailbox_size_limit = 0
     def install(cls, hostname: str = None) -> Dict:
         """Install Postfix."""
         try:
-            if hostname and not re.match(r'^[a-zA-Z0-9.-]+$', hostname):
+            if hostname and not re.fullmatch(r'[a-zA-Z0-9.-]+', hostname):
                 return {'success': False, 'error': 'Invalid hostname format'}
 
             # Pre-seed debconf to avoid interactive prompts. The values are

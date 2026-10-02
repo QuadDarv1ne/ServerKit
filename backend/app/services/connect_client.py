@@ -674,6 +674,8 @@ class RelayClient:
         self._thread = None
         self._stop = threading.Event()
         self._ws = None
+        # The browser tunnel for the live connection (connect_tunnel.py).
+        self._tunnel = None
         self._attempts_at = collections.deque()
         self._flap_logged = False
         self._last_written = None  # (state, reason, transport) transition dedup
@@ -852,6 +854,7 @@ class RelayClient:
             return f'refused:{_classify_ws_failure(exc)}'
 
         self._ws = ws
+        self._tunnel = self._new_tunnel(ws)
         try:
             # Consent is connection-scoped. Reconnect using empty probes.
             if self._diagnostics_collect:
@@ -905,6 +908,9 @@ class RelayClient:
             return f'drop:{_classify_ws_failure(exc)}'
         finally:
             self._ws = None
+            if self._tunnel is not None:
+                self._tunnel.shutdown()
+                self._tunnel = None
             for batch in reversed(list(self._logs_inflight.values())):
                 self._logs.requeue(batch)
             self._logs_inflight.clear()
@@ -1007,10 +1013,23 @@ class RelayClient:
             self._metrics.requeue(samples)
             logger.debug('Connect metrics: send failed, samples kept', exc_info=True)
 
+    def _new_tunnel(self, ws):
+        """The browser tunnel for this connection (connect_tunnel.py)."""
+        from app.services import cli_api_client, connect_tunnel
+        return connect_tunnel.Tunnel(lambda frame: self._send(ws, frame),
+                                     cli_api_client.resolve_port())
+
     def _handle_frame(self, ws, raw):
         try:
             frame = json.loads(raw)
         except ValueError:
+            return
+        tunnel = getattr(self, '_tunnel', None)
+        if frame.get('t') == 'data':
+            if tunnel is not None:
+                tunnel.data(frame)
+            return
+        if frame.get('t') == 'close' and tunnel is not None and tunnel.close(frame):
             return
         if frame.get('t') == 'close':
             stream_id = frame.get('s')
@@ -1050,6 +1069,10 @@ class RelayClient:
         if frame.get('t') == 'open':
             if frame.get('k') == 'command':
                 self._run_command(ws, frame)
+                return
+            # "Open panel" in ServerKit Cloud: a browser request or its
+            # Socket.IO socket, replayed on this panel's own port.
+            if tunnel is not None and tunnel.open(frame):
                 return
             # Anything else is a stream this client version does not speak.
             # Refusing honestly is what stops the relay holding it open.

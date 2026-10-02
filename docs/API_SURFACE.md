@@ -809,6 +809,7 @@ Regenerate (backend/):
 - `POST /auth/2fa/setup/confirm`
 - `POST /auth/2fa/verify`
 - `POST /auth/complete-onboarding`
+- `POST /auth/connect-session`
 - `POST /auth/login`
 - `POST /auth/login-links`
 - `POST /auth/login-links/redeem`

@@ -706,18 +706,6 @@ const Marketplace = () => {
     );
 };
 
-// Cover chrome differs by artwork: illustrated raster icons get a clean light
-// tile (their 3D art is drawn for a light backdrop and fills the space), while
-// glyph / Simple-Icons brand-mark fallbacks keep the deterministic gradient so
-// the white mark stays legible. `base` is the cover class ('extension-card__cover'
-// or 'extension-detail__cover').
-const coverProps = (base, entry, category) => {
-    if (resolveExtensionIcon(entry.installKey, category)) {
-        return { className: `${base} ${base}--icon` };
-    }
-    return { className: base, style: extensionCoverStyle(entry.installKey, category) };
-};
-
 const SectionHeader = ({ kicker, title, meta }) => (
     <div className="marketplace-section__header">
         <div>
@@ -728,38 +716,47 @@ const SectionHeader = ({ kicker, title, meta }) => (
     </div>
 );
 
-// Cover artwork with a deterministic fallback chain:
+// Cover banner + artwork with a deterministic fallback chain:
 // registry logo image -> bundled illustrated icon -> Simple Icons brand mark ->
-// manifest icon SVG -> category lucide glyph. Kept as its own component so both
-// the card and the detail modal share the exact same resolution order.
-const ExtensionCover = ({ entry, category, brandSize = 34 }) => {
+// manifest icon SVG -> category lucide glyph. Image artwork (logo or bundled
+// icon) sits on a clean light tile at one shared size; the white brand-mark /
+// glyph fallbacks keep the deterministic gradient so they stay legible. The
+// tile is chosen from what actually renders, so a registry logo that fails to
+// load falls back to the gradient instead of a white glyph on white. `base` is
+// the cover class ('extension-card__cover' or 'extension-detail__cover'); both
+// the card and the detail modal share this component.
+const ExtensionCover = ({ base, entry, category, brandSize = 34, children }) => {
     const [logoFailed, setLogoFailed] = useState(false);
+    const rasterIcon = resolveExtensionIcon(entry.installKey, category);
+    const imageSrc = entry.logo && !logoFailed ? entry.logo : rasterIcon;
+
+    if (imageSrc) {
+        return (
+            <div className={`${base} ${base}--icon`}>
+                <img
+                    src={imageSrc}
+                    loading="lazy"
+                    alt=""
+                    aria-hidden="true"
+                    className="extension-card__icon"
+                    onError={imageSrc === entry.logo ? () => setLogoFailed(true) : undefined}
+                />
+                {children}
+            </div>
+        );
+    }
+    return (
+        <div className={base} style={extensionCoverStyle(entry.installKey, category)}>
+            <ExtensionGlyph entry={entry} category={category} brandSize={brandSize} />
+            {children}
+        </div>
+    );
+};
+
+const ExtensionGlyph = ({ entry, category, brandSize }) => {
     const Icon = getCategoryIcon(category);
     const iconSvg = entry.icon ? sanitizeSvgInner(entry.icon) : '';
-    const rasterIcon = resolveExtensionIcon(entry.installKey, category);
 
-    if (entry.logo && !logoFailed) {
-        return (
-            <img
-                src={entry.logo}
-                loading="lazy"
-                alt=""
-                className="extension-card__logo"
-                onError={() => setLogoFailed(true)}
-            />
-        );
-    }
-    if (rasterIcon) {
-        return (
-            <img
-                src={rasterIcon}
-                loading="lazy"
-                alt=""
-                aria-hidden="true"
-                className="extension-card__icon"
-            />
-        );
-    }
     if (hasBrandMark(entry.installKey)) {
         return (
             <ExtensionBrandMark
@@ -810,14 +807,13 @@ const CatalogExtensionCard = ({ entry, installing, onInstall, onOpenDetail, stat
             onClick={openDetail}
             onKeyDown={handleKeyDown}
         >
-            <div {...coverProps('extension-card__cover', entry, category)}>
-                <ExtensionCover entry={entry} category={category} brandSize={34} />
+            <ExtensionCover base="extension-card__cover" entry={entry} category={category} brandSize={34}>
                 {entry.featured && (
                     <span className="extension-featured-badge">
                         <Star aria-hidden="true" /> {t('app.marketplace.featured', 'Featured')}
                     </span>
                 )}
-            </div>
+            </ExtensionCover>
             <div className="extension-card__badges">
                 <Badge variant={sourceBadgeVariant(entry.source)}>{entry.sourceLabel}</Badge>
                 <Badge variant="outline">{titleCase(category)}</Badge>
@@ -877,9 +873,7 @@ const ExtensionDetailModal = ({ entry, installing, statusVariant, onClose, onIns
     return (
         <Modal open onClose={onClose} title={entry.displayName} size="lg">
             <div className="extension-detail">
-                <div {...coverProps('extension-detail__cover', entry, category)}>
-                    <ExtensionCover entry={entry} category={category} brandSize={46} />
-                </div>
+                <ExtensionCover base="extension-detail__cover" entry={entry} category={category} brandSize={46} />
                 <div className="extension-detail__header">
                     <div className="extension-detail__heading">
                         <div className="extension-detail__badges">

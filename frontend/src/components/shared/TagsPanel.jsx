@@ -69,15 +69,15 @@ const TagsPanel = ({ resourceType, resourceId, readOnly = false }) => {
                 ) : tags.length === 0 ? (
                     <span className="shared-tags__hint">{t('app.tagsPanel.noTagsYet', 'No tags yet')}</span>
                 ) : (
-                    tags.map((t) => (
-                        <span key={t.id} className="shared-tag">
-                            <span className="shared-tag__label">{t.tag}</span>
+                    tags.map((tag) => (
+                        <span key={tag.id} className="shared-tag">
+                            <span className="shared-tag__label">{tag.tag}</span>
                             {!readOnly && (
                                 <Button variant="unstyled"
                                     type="button"
                                     className="shared-tag__remove"
-                                    onClick={() => handleRemove(t.tag)}
-                                    aria-label={t('app.tagsPanel.removeTag', 'Remove tag {{tag}}', { tag: t.tag })}
+                                    onClick={() => handleRemove(tag.tag)}
+                                    aria-label={t('app.tagsPanel.removeTag', 'Remove tag {{tag}}', { tag: tag.tag })}
                                     title={t('app.tagsPanel.removeTag2', 'Remove tag')}
                                 >
                                     &times;

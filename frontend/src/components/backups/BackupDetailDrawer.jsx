@@ -4,6 +4,7 @@
 // so its open/close slide animation plays even when there's no run selected.
 import { Drawer, Pill } from '@/components/ds';
 import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 import { Archive, RotateCcw, ShieldCheck, Download, Trash2, ExternalLink } from 'lucide-react';
 import { humanSize, formatMoney, formatDateTime, statusKind, storageLabel } from './format';
 import { useTranslation } from 'react-i18next';
@@ -79,9 +80,9 @@ export default function BackupDetailDrawer({ run, open, onClose, onRestore, onVe
                 </div>
 
                 {run.job_id && (
-                    <a className="backup-detail-drawer__joblink" href="/monitoring/jobs">
+                    <Link className="backup-detail-drawer__joblink" to="/monitoring/jobs">
                         <ExternalLink size={13} /> {t('app.backupDetailDrawer.viewJob', 'View job')}
-                    </a>
+                    </Link>
                 )}
             </div>
         </Drawer>

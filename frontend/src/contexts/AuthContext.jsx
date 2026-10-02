@@ -1,5 +1,6 @@
 import { useCallback, useState, useEffect } from 'react';
 import api from '../services/api';
+import { inTunnel, storageKey } from '../services/tunnelBase.js';
 import { presetForUseCases } from '../components/sidebarItems';
 
 import { AuthContext } from './useAuth.js';
@@ -29,7 +30,18 @@ export function AuthProvider({ children }) {
     });
 
     const checkAuth = useCallback(async () => {
-        const token = localStorage.getItem('access_token');
+        let token = localStorage.getItem(storageKey('access_token'));
+        if (!token && inTunnel) {
+            // Opened from ServerKit Cloud: the relay brought a grant that says
+            // who is asking. If this panel has a user with that email, sign
+            // them in; otherwise the normal login page shows.
+            try {
+                const data = await api.connectSession();
+                if (data?.access_token) token = data.access_token;
+            } catch {
+                // No matching user, or a grant this panel does not accept.
+            }
+        }
         if (token) {
             try {
                 const data = await api.getCurrentUser();

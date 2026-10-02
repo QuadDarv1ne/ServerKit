@@ -1,6 +1,7 @@
 // Base HTTP client - constructor, token management, core request methods
 import { workspaceStore } from '../workspaceStore.js';
 import { translateServerError } from './errorCodes.js';
+import { TUNNEL_BASE, storageKey } from '../tunnelBase.js';
 
 const AUTH_EXPIRED_EVENT = 'serverkit:auth-expired';
 
@@ -32,9 +33,15 @@ const normalizeApiBaseUrl = (url) => {
 // on window.location.origin in dev (see services/socket.js) because a WebSocket
 // upgrades out of the HTTP connection pool anyway.
 const viteEnv = import.meta.env || {};
-const API_BASE_URL = (viteEnv.DEV && viteEnv.VITE_API_PROXY === 'true')
+const configuredBase = (viteEnv.DEV && viteEnv.VITE_API_PROXY === 'true')
     ? '/api/v1'
     : normalizeApiBaseUrl(viteEnv.VITE_API_URL);
+// Opened through ServerKit Cloud's relay, every API call goes through the
+// relay under the panel's prefix (services/tunnelBase.js) — even in a build
+// with an absolute VITE_API_URL, since only the relay attaches Cloud's grant.
+const API_BASE_URL = TUNNEL_BASE
+    ? `${TUNNEL_BASE}${configuredBase.startsWith('/') ? configuredBase : '/api/v1'}`
+    : configuredBase;
 
 // Requests that are safe to share with a concurrent identical caller: a plain
 // GET with no body, no custom headers (X-DB-Password and friends change what
@@ -83,17 +90,17 @@ class ApiClient {
     }
 
     getToken() {
-        return localStorage.getItem('access_token');
+        return localStorage.getItem(storageKey('access_token'));
     }
 
     setTokens(accessToken, refreshToken) {
-        localStorage.setItem('access_token', accessToken);
-        localStorage.setItem('refresh_token', refreshToken);
+        localStorage.setItem(storageKey('access_token'), accessToken);
+        localStorage.setItem(storageKey('refresh_token'), refreshToken);
     }
 
     clearTokens() {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
+        localStorage.removeItem(storageKey('access_token'));
+        localStorage.removeItem(storageKey('refresh_token'));
         this.workspace.clearActiveWorkspace();  // drop workspace context on logout
     }
 
@@ -217,7 +224,7 @@ class ApiClient {
     }
 
     async refreshToken() {
-        const refreshToken = localStorage.getItem('refresh_token');
+        const refreshToken = localStorage.getItem(storageKey('refresh_token'));
         if (!refreshToken) return false;
 
         try {
@@ -231,7 +238,7 @@ class ApiClient {
 
             if (response.ok) {
                 const data = await response.json();
-                localStorage.setItem('access_token', data.access_token);
+                localStorage.setItem(storageKey('access_token'), data.access_token);
                 return true;
             }
             return false;

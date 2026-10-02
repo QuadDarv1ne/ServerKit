@@ -178,6 +178,23 @@ THREAD_OWNERSHIP = {
             'restart loses an attempt rather than the record of it.'
         ),
     },
+    'app/services/connect_tunnel.py:start:self._run': {
+        'owner': 'connect tunnel Socket.IO stream',
+        'lifecycle': LIFECYCLE_REQUEST_STREAM,
+        'rationale': (
+            'Bridges one browser Socket.IO socket from the relay to the '
+            'loopback listener; it ends when either side closes or the relay '
+            'connection drops (Tunnel.shutdown).'
+        ),
+    },
+    'app/services/connect_tunnel.py:_run:self._pump_in': {
+        'owner': 'connect tunnel Socket.IO stream',
+        'lifecycle': LIFECYCLE_REQUEST_STREAM,
+        'rationale': (
+            'The browser-to-panel half of the same bridged socket; stop() '
+            'wakes it with a sentinel so it exits with the stream.'
+        ),
+    },
 }
 
 
