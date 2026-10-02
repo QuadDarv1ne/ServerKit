@@ -147,6 +147,7 @@ PUBLIC_ALT_AUTH = {
     'agent_poll.disconnect': 'X-Session-Token lookup',
     'agent_poll.poll': 'X-Session-Token resolves the ConnectedAgent',
     'agent_poll.result': 'X-Session-Token resolves the ConnectedAgent',
+    'auth.connect_session': 'loopback-only + Cloud grant verified against JWKS, 30/min',
     'auth.login': 'password credential + per-IP/per-user throttles + lockout',
     'auth.passkey_authenticate': 'WebAuthn assertion verification, 5/min',
     'auth.redeem_login_link': 'single-use login-link token + per-IP throttle',
