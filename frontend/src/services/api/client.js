@@ -36,10 +36,11 @@ const viteEnv = import.meta.env || {};
 const configuredBase = (viteEnv.DEV && viteEnv.VITE_API_PROXY === 'true')
     ? '/api/v1'
     : normalizeApiBaseUrl(viteEnv.VITE_API_URL);
-// Opened through ServerKit Cloud's relay, a root-relative API path has to
-// carry the panel's prefix (services/tunnelBase.js).
-const API_BASE_URL = (TUNNEL_BASE && configuredBase.startsWith('/'))
-    ? `${TUNNEL_BASE}${configuredBase}`
+// Opened through ServerKit Cloud's relay, every API call goes through the
+// relay under the panel's prefix (services/tunnelBase.js) — even in a build
+// with an absolute VITE_API_URL, since only the relay attaches Cloud's grant.
+const API_BASE_URL = TUNNEL_BASE
+    ? `${TUNNEL_BASE}${configuredBase.startsWith('/') ? configuredBase : '/api/v1'}`
     : configuredBase;
 
 // Requests that are safe to share with a concurrent identical caller: a plain

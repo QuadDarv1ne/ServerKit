@@ -79,8 +79,8 @@ def verify_grant(token: str, device_id: str, jwks: dict, now: float = None) -> d
         raise ConnectSessionRefused('bad_grant', 'The grant is not readable.')
     key = next((k for k in jwks['keys'] if k.get('kid') == kid), None)
     # Keys carry their purpose; one published for anything else (signed
-    # commands) is not accepted as a sign-in.
-    if key is None or key.get('crv') != 'Ed25519' or key.get('purpose', 'session') != 'session':
+    # commands), or with none at all, is not accepted as a sign-in.
+    if key is None or key.get('crv') != 'Ed25519' or key.get('purpose') != 'session':
         raise ConnectSessionRefused('unknown_key', 'The grant was signed with a key this panel does not trust.')
     try:
         raw = base64.urlsafe_b64decode(key['x'] + '=' * (-len(key['x']) % 4))

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useResourceTier } from '../../contexts/useResourceTier.js';
 import { Sparkles, Check, Loader, AlertTriangle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -346,7 +347,7 @@ const SetupStepSummary = ({ accountInfo, useCases, twoFactorEnabled, onFinish })
                                 </div>
                                 {anyError && (
                                     <p className="recommendation-error">
-                                        {t('app.setupStepSummary.someExtensionsCouldnTBeInstalled', 'Some extensions couldn\'t be installed. You can retry from the')} <a href="/extensions">{t('common.labels.extensions', 'Extensions')}</a> page.
+                                        {t('app.setupStepSummary.someExtensionsCouldnTBeInstalled', 'Some extensions couldn\'t be installed. You can retry from the')} <Link to="/extensions">{t('common.labels.extensions', 'Extensions')}</Link> page.
                                     </p>
                                 )}
                             </>

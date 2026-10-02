@@ -162,8 +162,12 @@ class Tunnel:
             return
         prefix = payload.get('prefix') or ''
         prefix = prefix if PREFIX.match(prefix) else ''
+        # Straight to loopback: environment proxies (HTTP_PROXY and friends)
+        # would otherwise receive the grant, the bearer token and the body.
+        session = requests.Session()
+        session.trust_env = False
         try:
-            resp = requests.request(
+            resp = session.request(
                 payload.get('method') or 'GET',
                 f'http://127.0.0.1:{self._port}{path}',
                 headers=loopback_headers(payload),
@@ -238,7 +242,8 @@ class SioStream:
             headers = {k: v for k, v in loopback_headers(self._payload).items()
                        if k.lower() not in HANDSHAKE}
             self._ws = connect(f'ws://127.0.0.1:{self._port}{path}', origin=origin,
-                               additional_headers=headers, open_timeout=10)
+                               additional_headers=headers, open_timeout=10,
+                               proxy=None)
         except Exception as exc:
             logger.warning('Connect tunnel: Socket.IO did not open on the panel: %s', exc)
             self.stop()

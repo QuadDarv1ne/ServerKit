@@ -61,8 +61,9 @@ def test_the_socket_io_leg_makes_its_own_handshake(monkeypatch):
     # client's own made the panel answer 400 and every socket close at once.
     seen = {}
 
-    def fake_connect(url, origin=None, additional_headers=None, open_timeout=None):
-        seen.update(url=url, origin=origin, headers=additional_headers)
+    def fake_connect(url, origin=None, additional_headers=None, open_timeout=None,
+                     proxy=True):
+        seen.update(url=url, origin=origin, headers=additional_headers, proxy=proxy)
         raise OSError('stop here')
 
     import websockets.sync.client
@@ -80,6 +81,9 @@ def test_the_socket_io_leg_makes_its_own_handshake(monkeypatch):
     assert seen['headers']['User-Agent'] == 'Chrome'
     assert seen['headers']['X-ServerKit-Connect-Grant'] == 'g'
     assert seen['origin'] == 'http://127.0.0.1:5000'
+    # websockets 15 reads HTTPS_PROXY/ALL_PROXY by default; the loopback leg
+    # carries the grant and must never take a detour through one.
+    assert seen['proxy'] is None
     assert sent[-1] == {'s': 's1', 't': 'close'}
 
 
@@ -157,6 +161,18 @@ def test_a_redirect_stays_under_the_prefix(local_panel):
     assert frames[-1]['p']['headers']['Location'] == f'{PREFIX}/new'
 
 
+def test_the_loopback_replay_ignores_environment_proxies(local_panel, monkeypatch):
+    # requests honours HTTP_PROXY by default, which would hand the grant and
+    # the bearer token to whatever proxy the host has configured.
+    for name in ('HTTP_PROXY', 'http_proxy', 'ALL_PROXY', 'all_proxy'):
+        monkeypatch.setenv(name, 'http://127.0.0.1:1')
+    for name in ('NO_PROXY', 'no_proxy'):
+        monkeypatch.delenv(name, raising=False)
+    frames = _run_http(local_panel, {'method': 'GET', 'path': '/assets/app.js',
+                                     'headers': {}, 'grant': 'g'})
+    assert frames[-1]['p']['status'] == 200
+
+
 def test_a_panel_that_does_not_answer_is_a_refusal_not_a_blank_page():
     frames = _run_http(1, {'method': 'GET', 'path': '/', 'headers': {}})
     assert frames[-1]['reason'] == 'panel_unreachable'
@@ -203,6 +219,16 @@ def test_a_grant_that_does_not_hold_is_refused(mutate, code):
 
 def test_a_command_key_cannot_sign_somebody_in():
     sign, jwks = _signer(purpose='command')
+    with pytest.raises(connect_session.ConnectSessionRefused) as exc:
+        connect_session.verify_grant(sign(), DEVICE, jwks)
+    assert exc.value.code == 'unknown_key'
+
+
+def test_a_key_that_does_not_name_its_purpose_cannot_sign_somebody_in():
+    # Cloud publishes a purpose on every key; one without it is not
+    # presumed to be a session key.
+    sign, jwks = _signer()
+    del jwks['keys'][0]['purpose']
     with pytest.raises(connect_session.ConnectSessionRefused) as exc:
         connect_session.verify_grant(sign(), DEVICE, jwks)
     assert exc.value.code == 'unknown_key'
